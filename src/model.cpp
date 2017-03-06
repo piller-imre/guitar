@@ -10,9 +10,9 @@
 
 int count_tokens(const char* text)
 {
-    int i = 0;
-    int is_token = FALSE;
-    int count = 0;
+	int i = 0;
+	int is_token = FALSE;
+	int count = 0;
 
 	while (text[i] != 0) {
 		if (is_token == FALSE && text[i] != ' ') {
@@ -25,7 +25,7 @@ int count_tokens(const char* text)
 		++i;
 	}
 
-    return count;
+	return count;
 }
 
 void extract_tokens(const char* text, struct TokenArray* token_array)
@@ -37,7 +37,7 @@ void extract_tokens(const char* text, struct TokenArray* token_array)
 	n_tokens = count_tokens(text);
 
 	token_array->tokens = (char**)malloc(n_tokens * sizeof(char*));
-    token_array->n_tokens = 0;
+	token_array->n_tokens = 0;
 
 	i = 0;
 	while (text[i] != 0) {
@@ -98,17 +98,17 @@ void free_tokens(struct TokenArray* token_array)
 
 int load_model(const char* filename, struct Model* model)
 {
-    FILE* obj_file = fopen(filename, "r");
-    printf("Load model '%s' ...\n", filename);
-    if (obj_file == NULL) {
-        printf("ERROR: Unable to open '%s' file!\n", filename);
-    	return FALSE;
-    }
-    printf("Count ..\n");
+	FILE* obj_file = fopen(filename, "r");
+	printf("Load model '%s' ...\n", filename);
+	if (obj_file == NULL) {
+		printf("ERROR: Unable to open '%s' file!\n", filename);
+		return FALSE;
+	}
+	printf("Count ..\n");
 	count_elements(obj_file, model);
-    printf("Create ..\n");
+	printf("Create ..\n");
 	create_arrays(model);
-    printf("Read ..\n");
+	printf("Read ..\n");
 	read_elements(obj_file, model);
 
 	return TRUE;
@@ -116,70 +116,70 @@ int load_model(const char* filename, struct Model* model)
 
 void print_model_info(const struct Model* model)
 {
-    printf("Vertices: %d\n", model->n_vertices);
-    printf("Texture vertices: %d\n", model->n_texture_vertices);
-    printf("Normals: %d\n", model->n_normals);
-    printf("Triangles: %d\n", model->n_triangles);
-    printf("Quads: %d\n", model->n_quads);
+	printf("Vertices: %d\n", model->n_vertices);
+	printf("Texture vertices: %d\n", model->n_texture_vertices);
+	printf("Normals: %d\n", model->n_normals);
+	printf("Triangles: %d\n", model->n_triangles);
+	printf("Quads: %d\n", model->n_quads);
 }
 
 void free_model(struct Model* model)
 {
-    free(model->vertices);
-    free(model->texture_vertices);
-    free(model->normals);
-    free(model->triangles);
-    free(model->quads);
+	free(model->vertices);
+	free(model->texture_vertices);
+	free(model->normals);
+	free(model->triangles);
+	free(model->quads);
 }
 
 void count_elements(FILE* file, struct Model* model)
 {
-    char line[LINE_BUFFER_SIZE];
+	char line[LINE_BUFFER_SIZE];
 
-    init_model_counters(model);
-    while (fgets(line, LINE_BUFFER_SIZE, file) != NULL) {
-        clear_comment(line);
-        count_element_in_line(line, model);
-    }
+	init_model_counters(model);
+	while (fgets(line, LINE_BUFFER_SIZE, file) != NULL) {
+		clear_comment(line);
+		count_element_in_line(line, model);
+	}
 }
 
 void read_elements(FILE* file, struct Model* model)
 {
-    char line[LINE_BUFFER_SIZE];
+	char line[LINE_BUFFER_SIZE];
 
-    init_model_counters(model);
-    model->n_vertices = 1;
-    model->n_texture_vertices = 1;
-    model->n_normals = 1;
+	init_model_counters(model);
+	model->n_vertices = 1;
+	model->n_texture_vertices = 1;
+	model->n_normals = 1;
 
-    fseek(file, 0, SEEK_SET);
-    while (fgets(line, LINE_BUFFER_SIZE, file) != NULL) {
-        clear_comment(line);
-        read_element_from_line(line, model);
-    }
+	fseek(file, 0, SEEK_SET);
+	while (fgets(line, LINE_BUFFER_SIZE, file) != NULL) {
+		clear_comment(line);
+		read_element_from_line(line, model);
+	}
 }
 
 void init_model_counters(struct Model* model)
 {
-    model->n_vertices = 0;
-    model->n_texture_vertices = 0;
-    model->n_normals = 0;
-    model->n_triangles = 0;
-    model->n_quads = 0;
+	model->n_vertices = 0;
+	model->n_texture_vertices = 0;
+	model->n_normals = 0;
+	model->n_triangles = 0;
+	model->n_quads = 0;
 }
 
 void clear_comment(char* line)
 {
-    int i = 0;
-    while (line[i] != 0 && line[i] != '#') {
-        ++i;
-    }
-    if (line[i] == '#') {
-        while (line[i] != 0) {
-            line[i] = ' ';
-            ++i;
-        }
-    }
+	int i = 0;
+	while (line[i] != 0 && line[i] != '#') {
+		++i;
+	}
+	if (line[i] == '#') {
+		while (line[i] != 0) {
+			line[i] = ' ';
+			++i;
+		}
+	}
 }
 
 void count_element_in_line(const char* line, struct Model* model)
@@ -207,53 +207,53 @@ void count_element_in_line(const char* line, struct Model* model)
 			else if (token_array.n_tokens == 1 + 4) {
 				++model->n_quads;
 			}
-            else {
-                printf("WARN: Invalid number of face elements! %d\n", token_array.n_tokens);
-            }
+			else {
+				printf("WARN: Invalid number of face elements! %d\n", token_array.n_tokens);
+			}
 		}
 	}
 
-    free_tokens(&token_array);
+	free_tokens(&token_array);
 }
 
 void read_element_from_line(const char* line, struct Model* model)
 {
 	struct TokenArray token_array;
 	char* first_token;
-    struct Triangle* triangle;
-    struct Quad* quad;
+	struct Triangle* triangle;
+	struct Quad* quad;
 
 	extract_tokens(line, &token_array);
 
 	if (token_array.n_tokens > 0) {
 		first_token = token_array.tokens[0];
 		if (strcmp(first_token, "v") == 0) {
-            read_vertex(&token_array, &(model->vertices[model->n_vertices]));
+			read_vertex(&token_array, &(model->vertices[model->n_vertices]));
 			++model->n_vertices;
 		}
 		else if (strcmp(first_token, "vt") == 0) {
-            read_texture_vertex(&token_array, &(model->texture_vertices[model->n_texture_vertices]));
+			read_texture_vertex(&token_array, &(model->texture_vertices[model->n_texture_vertices]));
 			++model->n_texture_vertices;
 		}
 		else if (strcmp(first_token, "vn") == 0) {
-            read_normal(&token_array, &(model->normals[model->n_normals]));
+			read_normal(&token_array, &(model->normals[model->n_normals]));
 			++model->n_normals;
 		}
 		else if (strcmp(first_token, "f") == 0) {
 			if (token_array.n_tokens == 1 + 3) {
-                triangle = &(model->triangles[model->n_triangles]);
-                read_triangle(&token_array, triangle);
-                if (is_valid_triangle(triangle, model) == FALSE) {
-                    printf("line: '%s'\n", line);
-                }
+				triangle = &(model->triangles[model->n_triangles]);
+				read_triangle(&token_array, triangle);
+				if (is_valid_triangle(triangle, model) == FALSE) {
+					printf("line: '%s'\n", line);
+				}
 				++model->n_triangles;
 			}
 			else if (token_array.n_tokens == 1 + 4) {
-                quad = &(model->quads[model->n_quads]);
-                read_quad(&token_array, quad);
-                if (is_valid_quad(quad, model) == FALSE) {
-                    printf("line: '%s'\n", line);
-                }
+				quad = &(model->quads[model->n_quads]);
+				read_quad(&token_array, quad);
+				if (is_valid_quad(quad, model) == FALSE) {
+					printf("line: '%s'\n", line);
+				}
 				++model->n_quads;
 			}
 		}
@@ -264,227 +264,227 @@ void read_element_from_line(const char* line, struct Model* model)
 
 void create_arrays(struct Model* model)
 {
-    model->vertices = (struct Vertex*)malloc((model->n_vertices + 1) * sizeof(struct Vertex));
-    model->texture_vertices = (struct TextureVertex*)malloc((model->n_texture_vertices + 1) * sizeof(struct TextureVertex));
-    model->normals = (struct Vertex*)malloc((model->n_normals + 1) * sizeof(struct Vertex));
-    model->triangles = (struct Triangle*)malloc(model->n_triangles * sizeof(struct Triangle));
-    model->quads = (struct Quad*)malloc(model->n_quads * sizeof(struct Quad));
+	model->vertices = (struct Vertex*)malloc((model->n_vertices + 1) * sizeof(struct Vertex));
+	model->texture_vertices = (struct TextureVertex*)malloc((model->n_texture_vertices + 1) * sizeof(struct TextureVertex));
+	model->normals = (struct Vertex*)malloc((model->n_normals + 1) * sizeof(struct Vertex));
+	model->triangles = (struct Triangle*)malloc(model->n_triangles * sizeof(struct Triangle));
+	model->quads = (struct Quad*)malloc(model->n_quads * sizeof(struct Quad));
 }
 
 void read_vertex(const struct TokenArray* token_array, struct Vertex* vertex)
 {
-    vertex->x = atof(token_array->tokens[1]);
-    vertex->y = atof(token_array->tokens[2]);
-    vertex->z = atof(token_array->tokens[3]);
+	vertex->x = atof(token_array->tokens[1]);
+	vertex->y = atof(token_array->tokens[2]);
+	vertex->z = atof(token_array->tokens[3]);
 }
 
 void read_texture_vertex(const struct TokenArray* token_array, struct TextureVertex* texture_vertex)
 {
-    texture_vertex->u = atof(token_array->tokens[1]);
-    texture_vertex->v = atof(token_array->tokens[2]);
+	texture_vertex->u = atof(token_array->tokens[1]);
+	texture_vertex->v = atof(token_array->tokens[2]);
 }
 
 void read_normal(const struct TokenArray* token_array, struct Vertex* normal)
 {
-    normal->x = atof(token_array->tokens[1]);
-    normal->y = atof(token_array->tokens[2]);
-    normal->z = atof(token_array->tokens[3]);
+	normal->x = atof(token_array->tokens[1]);
+	normal->y = atof(token_array->tokens[2]);
+	normal->z = atof(token_array->tokens[3]);
 }
 
 void read_triangle(const struct TokenArray* token_array, struct Triangle* triangle)
 {
-    int i;
+	int i;
 
-    for (i = 0; i < 3; ++i) {
-        read_face_point(token_array->tokens[i + 1], &triangle->points[i]);
-    }
+	for (i = 0; i < 3; ++i) {
+		read_face_point(token_array->tokens[i + 1], &triangle->points[i]);
+	}
 }
 
 void read_quad(const struct TokenArray* token_array, struct Quad* quad)
 {
-    int i;
+	int i;
 
-    for (i = 0; i < 4; ++i) {
-        read_face_point(token_array->tokens[i + 1], &quad->points[i]);
-    }
+	for (i = 0; i < 4; ++i) {
+		read_face_point(token_array->tokens[i + 1], &quad->points[i]);
+	}
 }
 
 void read_face_point(const char* text, struct FacePoint* face_point)
 {
-    int delimiter_count;
-    const char* token;
-    int length;
+	int delimiter_count;
+	const char* token;
+	int length;
 
-    token = text;
-    delimiter_count = count_face_delimiters(text);
+	token = text;
+	delimiter_count = count_face_delimiters(text);
 
-    if (delimiter_count == 0) {
-        face_point->vertex_index = read_next_index(token, &length);
-        face_point->texture_index = INVALID_VERTEX_INDEX;
-        face_point->normal_index = INVALID_VERTEX_INDEX;
-    }
-    else if (delimiter_count == 1) {
-        face_point->vertex_index = read_next_index(token, &length);
-        token += length;
-        face_point->texture_index = read_next_index(token, &length);
-        face_point->normal_index = INVALID_VERTEX_INDEX;
-    }
-    else if (delimiter_count == 2) {
-        // TODO: Handle the v//n special case!
-        face_point->vertex_index = read_next_index(token, &length);
-        token += length;
-        face_point->texture_index = read_next_index(token, &length);
-        token += length;
-        face_point->normal_index = read_next_index(token, &length);
-    }
-    else {
-        printf("ERROR: Invalid face token! '%s'", text);
-    }
+	if (delimiter_count == 0) {
+		face_point->vertex_index = read_next_index(token, &length);
+		face_point->texture_index = INVALID_VERTEX_INDEX;
+		face_point->normal_index = INVALID_VERTEX_INDEX;
+	}
+	else if (delimiter_count == 1) {
+		face_point->vertex_index = read_next_index(token, &length);
+		token += length;
+		face_point->texture_index = read_next_index(token, &length);
+		face_point->normal_index = INVALID_VERTEX_INDEX;
+	}
+	else if (delimiter_count == 2) {
+		// TODO: Handle the v//n special case!
+		face_point->vertex_index = read_next_index(token, &length);
+		token += length;
+		face_point->texture_index = read_next_index(token, &length);
+		token += length;
+		face_point->normal_index = read_next_index(token, &length);
+	}
+	else {
+		printf("ERROR: Invalid face token! '%s'", text);
+	}
 }
 
 int count_face_delimiters(const char* text)
 {
-    int count, i;
+	int count, i;
 
-    count = 0;
-    i = 0;
-    while (text[i] != 0) {
-        if (text[i] == '/') {
-            ++count;
-        }
-        ++i;
-    }
+	count = 0;
+	i = 0;
+	while (text[i] != 0) {
+		if (text[i] == '/') {
+			++count;
+		}
+		++i;
+	}
 
-    return count;
+	return count;
 }
 
 int read_next_index(const char* text, int* length)
 {
-    int i, j, index;
-    char buffer[32];
+	int i, j, index;
+	char buffer[32];
 
-    i = 0;
-    while (text[i] != 0 && is_digit(text[i]) == FALSE) {
-        ++i;
-    }
+	i = 0;
+	while (text[i] != 0 && is_digit(text[i]) == FALSE) {
+		++i;
+	}
 
-    if (text[i] == 0) {
-        return INVALID_VERTEX_INDEX;
-    }
+	if (text[i] == 0) {
+		return INVALID_VERTEX_INDEX;
+	}
 
-    j = 0;
-    while (text[i] != 0 && is_digit(text[i]) == TRUE) {
-        buffer[j] = text[i];
-        ++i;
-        ++j;
-    }
-    buffer[j] = 0;
+	j = 0;
+	while (text[i] != 0 && is_digit(text[i]) == TRUE) {
+		buffer[j] = text[i];
+		++i;
+		++j;
+	}
+	buffer[j] = 0;
 
-    index = atoi(buffer);
-    *length = i;
+	index = atoi(buffer);
+	*length = i;
 
-    return index;
+	return index;
 }
 
 int is_digit(char c)
 {
-    if (c >= '0' && c <= '9') {
-        return TRUE;
-    }
-    return FALSE;
+	if (c >= '0' && c <= '9') {
+		return TRUE;
+	}
+	return FALSE;
 }
 
 int is_valid_triangle(const struct Triangle* triangle, const struct Model* model)
 {
-    int k;
+	int k;
 
-    for (k = 0; k < 3; ++k) {
-        if (triangle->points[k].vertex_index >= model->n_vertices) {
-            printf("ERROR: Invalid vertex index in a triangle!\n");
-            return FALSE;
-        }
-        if (triangle->points[k].texture_index >= model->n_texture_vertices) {
-            printf("ERROR: Invalid texture vertex index in a triangle!\n");
-            return FALSE;
-        }
-        if (triangle->points[k].normal_index >= model->n_normals) {
-            printf("ERROR: Invalid normal index in a triangle!\n");
-            return FALSE;
-        }
-    }
-    return TRUE;
+	for (k = 0; k < 3; ++k) {
+		if (triangle->points[k].vertex_index >= model->n_vertices) {
+			printf("ERROR: Invalid vertex index in a triangle!\n");
+			return FALSE;
+		}
+		if (triangle->points[k].texture_index >= model->n_texture_vertices) {
+			printf("ERROR: Invalid texture vertex index in a triangle!\n");
+			return FALSE;
+		}
+		if (triangle->points[k].normal_index >= model->n_normals) {
+			printf("ERROR: Invalid normal index in a triangle!\n");
+			return FALSE;
+		}
+	}
+	return TRUE;
 }
 
 int is_valid_quad(const struct Quad* quad, const struct Model* model)
 {
-    int k;
-    int vertex_index, texture_index, normal_index;
+	int k;
+	int vertex_index, texture_index, normal_index;
 
-    for (k = 0; k < 4; ++k) {
-        vertex_index = quad->points[k].vertex_index;
-        texture_index = quad->points[k].texture_index;
-        normal_index = quad->points[k].normal_index;
-        if (vertex_index < 0 || vertex_index >= model->n_vertices) {
-            printf("ERROR: Invalid vertex index in a quad!\n");
-            return FALSE;
-        }
-        if (texture_index < 0 || texture_index >= model->n_texture_vertices) {
-            printf("ERROR: Invalid texture vertex index in a quad!\n");
-            return FALSE;
-        }
-        if (normal_index < 0 || normal_index >= model->n_normals) {
-            printf("ERROR: Invalid normal index in a quad!");
-            return FALSE;
-        }
-    }
-    return TRUE;
+	for (k = 0; k < 4; ++k) {
+		vertex_index = quad->points[k].vertex_index;
+		texture_index = quad->points[k].texture_index;
+		normal_index = quad->points[k].normal_index;
+		if (vertex_index < 0 || vertex_index >= model->n_vertices) {
+			printf("ERROR: Invalid vertex index in a quad!\n");
+			return FALSE;
+		}
+		if (texture_index < 0 || texture_index >= model->n_texture_vertices) {
+			printf("ERROR: Invalid texture vertex index in a quad!\n");
+			return FALSE;
+		}
+		if (normal_index < 0 || normal_index >= model->n_normals) {
+			printf("ERROR: Invalid normal index in a quad!");
+			return FALSE;
+		}
+	}
+	return TRUE;
 }
 
 void print_bounding_box(const struct Model* model)
 {
-    int i;
-    double x, y, z;
-    double min_x, max_x, min_y, max_y, min_z, max_z;
+	int i;
+	double x, y, z;
+	double min_x, max_x, min_y, max_y, min_z, max_z;
 
-    if (model->n_vertices == 0) {
-        return;
-    }
+	if (model->n_vertices == 0) {
+		return;
+	}
 
-    min_x = model->vertices[0].x;
-    max_x = model->vertices[0].x;
-    min_y = model->vertices[0].y;
-    max_y = model->vertices[0].y;
-    min_z = model->vertices[0].z;
-    max_z = model->vertices[0].z;
+	min_x = model->vertices[0].x;
+	max_x = model->vertices[0].x;
+	min_y = model->vertices[0].y;
+	max_y = model->vertices[0].y;
+	min_z = model->vertices[0].z;
+	max_z = model->vertices[0].z;
 
-    for (i = 0; i < model->n_vertices; ++i) {
-        x = model->vertices[i].x;
-        y = model->vertices[i].y;
-        z = model->vertices[i].z;
-        if (x < min_x) {
-            min_x = x;
-        }
-        else if (x > max_x) {
-            max_x = x;
-        }
-        if (y < min_y) {
-            min_y = y;
-        }
-        else if (y > max_y) {
-            max_y = y;
-        }
-        if (z < min_z) {
-            min_z = z;
-        }
-        else if (z > max_z) {
-            max_z = z;
-        }
-    }
+	for (i = 0; i < model->n_vertices; ++i) {
+		x = model->vertices[i].x;
+		y = model->vertices[i].y;
+		z = model->vertices[i].z;
+		if (x < min_x) {
+			min_x = x;
+		}
+		else if (x > max_x) {
+			max_x = x;
+		}
+		if (y < min_y) {
+			min_y = y;
+		}
+		else if (y > max_y) {
+			max_y = y;
+		}
+		if (z < min_z) {
+			min_z = z;
+		}
+		else if (z > max_z) {
+			max_z = z;
+		}
+	}
 
-    printf("Bounding box:\n");
-    printf("x in [%lf, %lf]\n", min_x, max_x);
-    printf("y in [%lf, %lf]\n", min_y, max_y);
-    printf("z in [%lf, %lf]\n", min_z, max_z);
+	printf("Bounding box:\n");
+	printf("x in [%lf, %lf]\n", min_x, max_x);
+	printf("y in [%lf, %lf]\n", min_y, max_y);
+	printf("z in [%lf, %lf]\n", min_z, max_z);
 }
 
 void scale_model(struct Model* model, double sx, double sy, double sz)
@@ -496,73 +496,5 @@ void scale_model(struct Model* model, double sx, double sy, double sz)
 		model->vertices[i].y *= sy;
 		model->vertices[i].z *= sz;
 	}
-}
-
-
-// draw.c-bol
-void draw_triangles(const struct Model* model)
-{
-    int i, k;
-    int vertex_index, texture_index;
-    float x, y, z, u, v;
-
-    glBegin(GL_TRIANGLES);
-
-    for (i = 0; i < model->n_triangles; ++i)
-    {
-        for (k = 0; k < 3; ++k)
-        {
-
-            texture_index = model->triangles[i].points[k].texture_index;
-            u = model->texture_vertices[texture_index].u;
-            v = model->texture_vertices[texture_index].v;
-            // NOTE: The 1-v is model file specific!
-            glTexCoord2f(u, 1 - v);
-
-            vertex_index = model->triangles[i].points[k].vertex_index;
-            x = model->vertices[vertex_index].x;
-            y = model->vertices[vertex_index].y;
-            z = model->vertices[vertex_index].z;
-            glVertex3d(x, y, z);
-        }
-    }
-
-    glEnd();
-}
-
-void draw_quads(const struct Model* model)
-{
-    int i, k;
-    int vertex_index, texture_index;
-    float x, y, z, u, v;
-
-    glBegin(GL_QUADS);
-
-    for (i = 0; i < model->n_quads; ++i)
-    {
-        for (k = 0; k < 4; ++k)
-        {
-
-            texture_index = model->quads[i].points[k].texture_index;
-            u = model->texture_vertices[texture_index].u;
-            v = model->texture_vertices[texture_index].v;
-            // NOTE: The 1-v is model file specific!
-            glTexCoord2f(u, 1 - v);
-
-            vertex_index = model->quads[i].points[k].vertex_index;
-            x = model->vertices[vertex_index].x;
-            y = model->vertices[vertex_index].y;
-            z = model->vertices[vertex_index].z;
-            glVertex3d(x, y, z);
-        }
-    }
-
-    glEnd();
-}
-
-void draw_model(const struct Model* model)
-{
-    draw_triangles(model);
-    draw_quads(model);
 }
 

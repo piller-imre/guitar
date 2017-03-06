@@ -1,18 +1,17 @@
-#include "model.h"
-#include "DrawScene.h"
-#include <stdio.h>
+ï»¿#include "DrawScene.h"
+#include "Camera.h"
 #include <iostream>
 #include <string>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 // http://www.glfw.org/docs/latest/group__buttons.html
-// #include <glfw3.h>
 #define GLFW_MOUSE_BUTTON_LEFT 0
 
 using namespace std;
-inline float ToRad(float angle_degrees){
-	return angle_degrees * M_PI / 180.0f;}
+inline float ToRad(float angle_degrees) {
+	return angle_degrees * M_PI / 180.0f;
+}
 
 int window;
 static GLint fogMode;
@@ -31,18 +30,12 @@ int y_difference = 0;
 float fog_strt = 130.0f, fog_end = 140.0f;
 bool clck_start = false, clck_help = false, clck_quit = false, clck_yes = false, clck_no = false, help_back = false, clck_low = false, clck_med = false, clck_hi = false;
 
-//mozgáshoz vagy irányításhoz szüksékes deklarációk
-bool go_forward = false, go_backward = false;
-bool look_up = false, look_down = false;
-bool turn_left = false, turn_right = false;
-bool go_left = false, go_right = false;
+//irÃ¡nyÃ­tÃ¡shoz szÃ¼ksÃ©kes deklarÃ¡ciÃ³k
 bool quit_down = false;
-bool menu = true;
-bool light_up = false, light_down = false;
 bool state_of_doors = true;
-bool guitar_rot = false; //mozgáshoz vagy irányításhoz szüksékes deklarációk vége
+bool guitar_rot = false; //irÃ¡nyÃ­tÃ¡shoz szÃ¼ksÃ©kes deklarÃ¡ciÃ³k vÃ©ge
 
-bool help = false, quit1 = false, main_menu = true, openable = false, wait = false;
+bool help = false, quit1 = false, main_menu = true, wait = false;
 int light_menu = 0;
 float ambientvalue = 1.0f;
 GLfloat light_position_front_left[] = { 101.0f, 120.0f, 90.0f, 1.0f };
@@ -55,20 +48,12 @@ GLfloat cut[] = { 3.2f };
 GLfloat light_ambient[] = { 0.1f,0.1f,0.1f,1.0f };
 GLfloat light_diffuse[] = { 0.0f,0.1f,0.1f,1.0f };
 GLfloat light_specular[] = { 0.0f,0.0f,0.0f,1.0f };
-GLfloat light_direction[] = { -1.0f, -1.0f, -1.0f};
+GLfloat light_direction[] = { -1.0f, -1.0f, -1.0f };
 bool light = true;
-float fraction = 0.1f;
+//float fraction = 0.1f;
 
-Model_betolto raptor_model;
-Model_betolto house_model;
-Model_betolto weapon_model;
-Model_betolto tree_model;
-Model_betolto rock_model;
-Model_betolto mountain_model_small;
-Model_betolto mountain_model;
-Model_betolto mountain_model_big;
-Model_betolto mountain_model_biggest;
 DrawScene world;
+Camera camera;
 
 static void Fog(void)
 {
@@ -102,10 +87,10 @@ static void Fog(void)
 
 bool Openeable_controller()
 {
-	if ((xpos >= -4.9f) && (xpos <= 4.9f) && (zpos >= -73.5f) && (zpos <= -65.0f))	{
+	if ((xpos >= -4.9f) && (xpos <= 4.9f) && (zpos >= -73.5f) && (zpos <= -65.0f)) {
 		return true;
 	}
-	if ((xpos >= -4.9f) && (xpos <= 4.9f) && (zpos <= -77.5f) && (zpos >= -86.0f))	{
+	if ((xpos >= -4.9f) && (xpos <= 4.9f) && (zpos <= -77.5f) && (zpos >= -86.0f)) {
 		return true;
 	}
 	return false;
@@ -125,20 +110,20 @@ void collision_detector()
 	if (zpos <= -113.5f) {
 		zpos = -113.5f;
 	}
-		if (state_of_doors == true)	{
-			if ((xpos <=5.0f) && (xpos >=-5.0f) && (zpos >=-75.5f) && (zpos <= -73.5f))			{
-				if (zpos <= -73.5)			{
-					zpos = -73.5;
-				}
+	if (state_of_doors == true) {
+		if ((xpos <= 5.0f) && (xpos >= -5.0f) && (zpos >= -75.5f) && (zpos <= -73.5f)) {
+			if (zpos <= -73.5) {
+				zpos = -73.5;
 			}
+		}
 
-			if ((xpos <= 5.0f) && (xpos >= -5.0f) && (zpos <= -75.5f) && (zpos >= -77.5f))		{
-				if (zpos >= -77.5)			{
-					zpos = -77.5;
-				}
+		if ((xpos <= 5.0f) && (xpos >= -5.0f) && (zpos <= -75.5f) && (zpos >= -77.5f)) {
+			if (zpos >= -77.5) {
+				zpos = -77.5;
 			}
+		}
 	}
-	//híd bal
+	//hÃ­d bal
 	if ((zpos <= -68.0f)) {
 		if (xpos <= -2.4f) {
 			xpos = -2.4f;
@@ -149,7 +134,7 @@ void collision_detector()
 			zpos = -67.0f;
 		}
 	}
-	//híd jobb
+	//hÃ­d jobb
 	if (zpos <= -68.0f) {
 		if (xpos >= 2.4f) {
 			xpos = 2.4f;
@@ -181,7 +166,7 @@ void collision_detector()
 			xpos = 4.0f;
 		}
 	}
-	//bal elsõ oszlop
+	//bal elsÃµ oszlop
 	if ((xpos >= -12.9f) && (xpos <= -9.1f) && (zpos >= -38.9f)) {
 		if (zpos <= -36.9f) {
 			zpos = -36.9f;
@@ -202,7 +187,7 @@ void collision_detector()
 			xpos = -13.9f;
 		}
 	}
-	//jobb elsõ oszlop
+	//jobb elsÃµ oszlop
 	if ((xpos <= 12.9f) && (xpos >= 9.1f) && (zpos >= -38.9f)) {
 		if (zpos <= -36.9f) {
 			zpos = -36.9f;
@@ -223,7 +208,7 @@ void collision_detector()
 			xpos = 13.9f;
 		}
 	}
-	//bal hátsó oszlop
+	//bal hÃ¡tsÃ³ oszlop
 	if ((xpos >= -13.6f) && (xpos <= -8.2f) && (zpos >= -8.9f)) {
 		if (zpos <= -6.9f) {
 			zpos = -6.9f;
@@ -244,7 +229,7 @@ void collision_detector()
 			xpos = -13.9f;
 		}
 	}
-	//jobb hátsó oszlop
+	//jobb hÃ¡tsÃ³ oszlop
 	if ((xpos <= 13.6f) && (xpos >= 8.2f) && (zpos >= -8.9f)) {
 		if (zpos <= -6.9f) {
 			zpos = -6.9f;
@@ -270,49 +255,49 @@ void collision_detector()
 void timer(int) {
 	glutPostRedisplay();
 	glutTimerFunc(1000 / 100, timer, 0);
-	if (go_forward == true)	{
+	if (camera.needGoForward()) {
 		xpos += (float)sin(yrot*3.14f / 180.0f) * 0.2f;
 		zpos += (float)cos(yrot*3.14f / 180.0f) * 0.2f;
 		collision_detector();
 	}
-	if (go_backward == true)	{
+	if (camera.needGoBackward()) {
 		xpos -= (float)sin(yrot*3.14f / 180.0f) * 0.2f;
 		zpos -= (float)cos(yrot*3.14f / 180.0f) * 0.2f;
 		collision_detector();
 	}
-	if (go_left == true)	{
+	if (camera.needStrafeLeft()) {
 		xpos += (float)cos(yrot*3.14f / 180.0f) * 0.15f;
 		zpos += (float)sin(yrot*3.14f / 180.0f) * -0.15f;
 		collision_detector();
 	}
-	if (go_right == true)	{
+	if (camera.needStrafeRight()) {
 		xpos -= (float)cos(yrot*3.14f / 180.0f) * 0.15f;
 		zpos -= (float)sin(yrot*3.14f / 180.0f) * -0.15f;
 		collision_detector();
 	}
-	if (look_up == true)	{
-		if (xrot >= 87.0f)	{
+	if (camera.needLookUp()) {
+		if (xrot >= 87.0f) {
 			xrot = 87.0f;
 		}
-		else	{
+		else {
 			xrot += 1.0f;
 		}
 	}
-	if (look_down == true)	{
-		if (xrot <= -87.0f)	{
+	if (camera.needLookDown()) {
+		if (xrot <= -87.0f) {
 			xrot = -87.0f;
 		}
-		else		{
+		else {
 			xrot -= 1.0f;
 		}
 	}
-	if (turn_left == true)	{
-		yrot += 1.0f;		
+	if (camera.needTurnLeft()) {
+		yrot += 1.0f;
 	}
-	if (turn_right == true)	{
+	if (camera.needTurnRight()) {
 		yrot -= 1.0f;
 	}
-	if (light == true)	{
+	if (light == true) {
 		for (int i = 0; i<3; i++) {
 			light_ambient_menu[i] = 0.8f;
 		}
@@ -364,63 +349,65 @@ void timer(int) {
 static void key_down(unsigned char key, int x, int y)
 {
 	bool openable_door = Openeable_controller();
-	if ((main_menu == false) && (quit1 == false))	{
-		switch (key)	{
+	if ((main_menu == false) && (quit1 == false)) {
+		switch (key) {
 		case 'w':
-			go_forward = true;
+			camera.startGoForward();
 			break;
 		case 'W':
-			go_forward = true;
+			camera.startGoForward();
 			break;
 		case 's':
-			go_backward = true;
+			camera.startGoBackward();
 			break;
 		case 'S':
-			go_backward = true;
+			camera.startGoBackward();
 			break;
 		case 'd':
-			go_right = true;
+			camera.startStrafeRight();
 			break;
 		case 'D':
-			go_right = true;
+			camera.startStrafeRight();
 			break;
 		case 'a':
-			go_left = true;
+			camera.startStrafeLeft();
 			break;
 		case 'A':
-			go_left = true;
+			camera.startStrafeLeft();
 			break;
 		case '8':
-			look_up = true;
+			camera.startLookUp();
 			break;
 		case '5':
-			look_down = true;
+			camera.startLookDown();
 			break;
 		case '4':
-			turn_left = true;
+			camera.startTurnLeft();
 			break;
 		case '6':
-			turn_right = true;
+			camera.startTurnRight();
 			break;
 		case 'f':
-			if (openable_door == true)			{
-				state_of_doors = !state_of_doors;}
+			if (openable_door == true) {
+				state_of_doors = !state_of_doors;
+			}
 			break;
 		case 'F':
-			if (openable_door == true)			{
-				state_of_doors = !state_of_doors;}
+			if (openable_door == true) {
+				state_of_doors = !state_of_doors;
+			}
 			break;
 		case 'r':
 			guitar_rot = !guitar_rot;
 			break;
 		case 'R':
 			guitar_rot = !guitar_rot;
-			break;	
+			break;
 		}
 	}
 	if (quit1 == false)
 	{
-		switch (key)	{
+		switch (key) {
 		case 13:
 			main_menu = false;
 			light = false;
@@ -430,7 +417,7 @@ static void key_down(unsigned char key, int x, int y)
 
 	if (quit1 == true)
 	{
-		switch (key)	{
+		switch (key) {
 		case 'y':
 			glutDestroyWindow(1);
 			exit(0);
@@ -456,7 +443,7 @@ static void key_down(unsigned char key, int x, int y)
 		switch (key) {
 		case 27:
 			help = false;
-			if(main_menu == false)
+			if (main_menu == false)
 				light = false;
 			break;
 		}
@@ -489,106 +476,106 @@ static void key_down(unsigned char key, int x, int y)
 		}
 	}
 
-	switch (key)	{
-		case 'p':
-			main_menu = true;
-			light = true;
-			break;
-		case 'P':
-			main_menu = true;
-			break;
-		case 'n':
-			quit1 = false;
-			if(main_menu == false)
-				light = false;
-			break;
-		case 'N':
-			quit1 = false;
-			break;
-		case '+':
-			if (light_diffuse[1]<1.0f) {
-				for (int i = 0; i<3; i++) {
-					light_diffuse[i] += 0.1f;
-					light_menu++;
-				}
-				light_diffuse[0] = 0.1f;
-			}	
-			break;
-		case '-':
-			if (light_diffuse[1]>0.2) {
-				for (int i = 0; i<3; i++) {
-					light_diffuse[i] -= 0.1f;
-					light_menu--;
-				}
-				light_diffuse[0] = 0.1f;
+	switch (key) {
+	case 'p':
+		main_menu = true;
+		light = true;
+		break;
+	case 'P':
+		main_menu = true;
+		break;
+	case 'n':
+		quit1 = false;
+		if (main_menu == false)
+			light = false;
+		break;
+	case 'N':
+		quit1 = false;
+		break;
+	case '+':
+		if (light_diffuse[1]<1.0f) {
+			for (int i = 0; i<3; i++) {
+				light_diffuse[i] += 0.1f;
+				light_menu++;
 			}
-			break;
-		case 'e':
-			if (fog_strt < 170.0f)
-			{
-				fog_strt += 10.0f;
+			light_diffuse[0] = 0.1f;
+		}
+		break;
+	case '-':
+		if (light_diffuse[1]>0.2) {
+			for (int i = 0; i<3; i++) {
+				light_diffuse[i] -= 0.1f;
+				light_menu--;
 			}
-			else {
-				fog_strt = 170.0f;
-			}
-			if (fog_strt >= 140.0f)
-				fog_end += 10.0f;
-			Fog();
-			break;
-		case 'q':
-			if (fog_strt > 0.0f) {
-				fog_strt -= 10.0f;
-			}
-			else {
-				fog_strt = 0.0f;
-			}
-			if (fog_strt >= 140.0f)
-				fog_end -= 10.0f;
-			Fog();
-			break;
+			light_diffuse[0] = 0.1f;
+		}
+		break;
+	case 'e':
+		if (fog_strt < 170.0f)
+		{
+			fog_strt += 10.0f;
+		}
+		else {
+			fog_strt = 170.0f;
+		}
+		if (fog_strt >= 140.0f)
+			fog_end += 10.0f;
+		Fog();
+		break;
+	case 'q':
+		if (fog_strt > 0.0f) {
+			fog_strt -= 10.0f;
+		}
+		else {
+			fog_strt = 0.0f;
+		}
+		if (fog_strt >= 140.0f)
+			fog_end -= 10.0f;
+		Fog();
+		break;
 	}
 	glutPostRedisplay();
 }
 
 static void key_up(unsigned char key, int x, int y)
 {
-	if ((main_menu == false) && (quit1 == false))	{
-		switch (key)		{
+	if ((main_menu == false) && (quit1 == false)) {
+		switch (key) {
 		case 'w':
-			go_forward = false;
+			camera.stopForward();
 			break;
 		case 'W':
-			go_forward = false;
+			camera.stopForward();
 			break;
 		case 's':
-			go_backward = false;
+			camera.stopBackward();
 			break;
 		case 'S':
-			go_backward = false;
+			camera.stopBackward();
 			break;
 		case 'd':
-			go_right = false;
+			camera.stopStrafeRight();
 			break;
 		case 'D':
-			go_right = false;
+			camera.stopStrafeRight();
 			break;
 		case 'a':
-			go_left = false;
+			camera.stopStrafeLeft();
 			break;
 		case 'A':
-			go_left = false;
+			camera.stopStrafeLeft();
 			break;
 		case '8':
-			look_up = false;
+			camera.stopLookUp();
 			break;
 		case '5':
-			look_down = false;
+			camera.stopLookDown();
 			break;
 		case '4':
-			turn_left = false;
+			camera.stopTurnLeft();
 			break;
 		case '6':
-			turn_right = false;
+			camera.stopTurnRight();
 			break;
 		}
 	}
@@ -597,17 +584,17 @@ static void key_up(unsigned char key, int x, int y)
 		bool loaded = false;
 		switch (key) {
 		case 'l':
-			world.LoadTextures(1);		
+			world.LoadTextures(1);
 			wait = false;
 			active_quality = 1;
 			break;
 		case 'm':
-			world.LoadTextures(2);		
+			world.LoadTextures(2);
 			wait = false;
 			active_quality = 2;
 			break;
 		case 'h':
-			world.LoadTextures(3);		
+			world.LoadTextures(3);
 			wait = false;
 			active_quality = 3;
 			break;
@@ -617,45 +604,32 @@ static void key_up(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
-void LoadModel()
-{
-	raptor_model.load("Data/raptor.obj", 0.2f, "Data/raptor.png");
-	house_model.load("Data/house.obj", 0.2f, "Data/house.png");
-	weapon_model.load("Data/weapon.obj", 0.2f, "Data/weapon.png");
-	rock_model.load("Data/Rock1.obj", 0.15f, "Data/Rock1.png");
-	mountain_model_small.load("Data/mountain.obj", 1.0f, "Data/mountain.png");
-	mountain_model.load("Data/mountain.obj",1.8f, "Data/mountain.png");
-	mountain_model_big.load("Data/mountain.obj", 3.8f, "Data/mountain.png");
-	mountain_model_biggest.load("Data/mountain.obj", 6.8f, "Data/mountain.png");
-	tree_model.load("Data/lowpolytree.obj", 0.6f, "Data/lowpolytree.png");
-}
-
 bool LoadGUITextures()                                    // Load Bitmaps And Convert To Textures
 {
 	char *texture_names[7] = { "Data/help.png","Data/quit.png","Data/mainmenu.jpg","Data/light_set.png","Data/back.png","Data/active_quality.png","Data/wait.jpg" };
-		for (int i = 0; i < 7; ++i) {
-			textures[i] = SOIL_load_OGL_texture
-				(texture_names[i],
-					SOIL_LOAD_AUTO,
-					SOIL_CREATE_NEW_ID,
-					SOIL_FLAG_MIPMAPS | SOIL_FLAG_POWER_OF_TWO);
-			if (textures[i] == 0) {
-				cout << "Not found, or corrupt " << texture_names[i] << " .....\n";
-				return false;
-			}
-			else cout << "Loading " << texture_names[i] << " .....\n";
-			glBindTexture(GL_TEXTURE_2D, textures[i]);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		}	return true;
+	for (int i = 0; i < 7; ++i) {
+		textures[i] = SOIL_load_OGL_texture
+		(texture_names[i],
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_POWER_OF_TWO);
+		if (textures[i] == 0) {
+			cout << "Not found, or corrupt " << texture_names[i] << " .....\n";
+			return false;
+		}
+		else cout << "Loading " << texture_names[i] << " .....\n";
+		glBindTexture(GL_TEXTURE_2D, textures[i]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}	return true;
 }
 
 static int Width(char resolution_in)
 {
 	int width;
-	switch (resolution_in){
+	switch (resolution_in) {
 	case '1':
 		width = 640;
 		return width;
@@ -674,13 +648,14 @@ static int Width(char resolution_in)
 		break;
 	default:
 		return 0;
-		break;	}
+		break;
+	}
 }
 
 static int Height(char resolution_in)
 {
 	int height;
-	switch (resolution_in)	{
+	switch (resolution_in) {
 	case '1':
 		height = 360;
 		return height;
@@ -699,7 +674,8 @@ static int Height(char resolution_in)
 		break;
 	default:
 		return 0;
-		break;	}
+		break;
+	}
 }
 
 static void spec(int key, int x, int y) {
@@ -708,18 +684,19 @@ static void spec(int key, int x, int y) {
 		help = !help;
 		if ((main_menu == false) && (quit1 == false))
 			light = !light;
-		break;}
+		break;
+	}
 	glutPostRedisplay();
 }
 
 static void resize(int width, int height)
 {
 	aspect_ratio = (float)width / (float)height;
-	if (aspect_ratio < 1.77778)	{
+	if (aspect_ratio < 1.77778) {
 		height = (width / 16.0) * 9.0;
 		y_difference = ((width / aspect_ratio) - (width / 1.77778)) / 2;
 	}
-	else if (aspect_ratio > 1.77778)	{
+	else if (aspect_ratio > 1.77778) {
 		width = (height / 9.0) * 16.0;
 		x_difference = ((height * aspect_ratio) - (height * 1.77778)) / 2;
 	}
@@ -915,9 +892,9 @@ static void display(void)
 {
 	//glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
 	glLoadIdentity();
-	/*mozgás, forgás*/glMatrixMode(GL_MODELVIEW);
+	/*mozgÃ¡s, forgÃ¡s*/glMatrixMode(GL_MODELVIEW);
 	float verticalAngle = ToRad(xrot);
 	float horizontalAngle = ToRad(yrot);
 
@@ -926,7 +903,7 @@ static void display(void)
 	float dz = cos(verticalAngle) * cos(horizontalAngle);
 
 	float cx = xpos + dx, cy = ypos + dy, cz = zpos + dz;
-	gluLookAt(xpos, ypos, zpos, cx, cy, cz, 0, 1, 0);/*mozgás, forgás vége*/
+	gluLookAt(xpos, ypos, zpos, cx, cy, cz, 0, 1, 0);/*mozgÃ¡s, forgÃ¡s vÃ©ge*/
 
 	glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient_menu);
 
@@ -958,33 +935,10 @@ static void display(void)
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LINE_SMOOTH);
-	//modellek kirajzolása/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    house_model.draw(-30, 2.5, -120);
-	raptor_model.draw(100, 0, -80);
-	raptor_model.draw(70, 0, -130);
-	weapon_model.draw(-15, 1.5, 8.0);
-	rock_model.draw(2.5, -1.1, -81);
-	rock_model.draw(-2.5, -1.1, -106);
-	rock_model.draw(0.5, -1.1, -113);
-	rock_model.draw(-0.8, -1.1, -93);
-	mountain_model_small.draw(30,-1,-130);
-	mountain_model_small.draw(40, 0, -120);
-	mountain_model.draw(40, -2, -150);
-	mountain_model.draw(-30, -2, -190);
-	mountain_model.draw(50, -1.5, -105);
-	mountain_model_big.draw(-70, -2, -180);
-	mountain_model_big.draw(80, -5, -40);
-	mountain_model_big.draw(-50, -16, -90);
-	mountain_model_big.draw(-52, -15, -65);
-	mountain_model_biggest.draw(-100,-15,-70);
-	mountain_model_biggest.draw(-140, -6,-10);
-	tree_model.draw(15,-2,-120);
-	//modell kirajzolás vége/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	world.Draw_World_Pub(guitar_rot_angle, L_door_angle, R_door_angle);
 
-	glDisable(GL_TEXTURE_2D);
-	//segítség menü textúra
+	//segÃ­tsÃ©g menÃ¼ textÃºra
 	if (help) {
 		glLoadIdentity();
 		glEnable(GL_TEXTURE_2D);
@@ -997,7 +951,7 @@ static void display(void)
 		glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, 0.55f, -1.3f);
 		glEnd();
 	}
-	// kilepes menu textúra
+	// kilepes menu textÃºra
 	if (quit1 == true) {
 		glLoadIdentity();
 		glEnable(GL_TEXTURE_2D);
@@ -1010,7 +964,7 @@ static void display(void)
 		glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, 0.55f, -1.2f);
 		glEnd();
 	}
-	// fõmenu textúra
+	// fÃµmenu textÃºra
 	if (main_menu == true) {
 		glLoadIdentity();
 		glEnable(GL_TEXTURE_2D);
@@ -1022,9 +976,9 @@ static void display(void)
 		glTexCoord2f(0.0f, 1.0f); glVertex3f(1.05f, 0.6f, -1.4f);
 		glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.05f, 0.6f, -1.4f);
 		glEnd();
-		//hangerõ csúszka
+		//hangerÃµ csÃºszka
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		if (light_menu == 0)		{
+		if (light_menu == 0) {
 			glLoadIdentity();
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textures[3]);
@@ -1035,7 +989,7 @@ static void display(void)
 			glTexCoord2f(1.0f, 1.0f); glVertex3f(0.815f, -0.24f, -1.3f);
 			glEnd();
 		}
-		if (light_menu == 3)		{
+		if (light_menu == 3) {
 			glLoadIdentity();
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textures[3]);
@@ -1046,7 +1000,7 @@ static void display(void)
 			glTexCoord2f(1.0f, 1.0f); glVertex3f(0.815f, -0.20f, -1.3f);
 			glEnd();
 		}
-		if (light_menu == 6)		{
+		if (light_menu == 6) {
 			glLoadIdentity();
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textures[3]);
@@ -1057,7 +1011,7 @@ static void display(void)
 			glTexCoord2f(1.0f, 1.0f); glVertex3f(0.815f, -0.16f, -1.3f);
 			glEnd();
 		}
-		if (light_menu == 9)		{
+		if (light_menu == 9) {
 			glLoadIdentity();
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textures[3]);
@@ -1068,7 +1022,7 @@ static void display(void)
 			glTexCoord2f(1.0f, 1.0f); glVertex3f(0.815f, -0.115f, -1.3f);
 			glEnd();
 		}
-		if (light_menu == 12)		{
+		if (light_menu == 12) {
 			glLoadIdentity();
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textures[3]);
@@ -1079,7 +1033,7 @@ static void display(void)
 			glTexCoord2f(1.0f, 1.0f); glVertex3f(0.815f, -0.07f, -1.3f);
 			glEnd();
 		}
-		if (light_menu == 15)	{
+		if (light_menu == 15) {
 			glLoadIdentity();
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textures[3]);
@@ -1090,7 +1044,7 @@ static void display(void)
 			glTexCoord2f(1.0f, 1.0f); glVertex3f(0.815f, -0.025f, -1.3f);
 			glEnd();
 		}
-		if (light_menu == 18)	    {
+		if (light_menu == 18) {
 			glLoadIdentity();
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textures[3]);
@@ -1101,7 +1055,7 @@ static void display(void)
 			glTexCoord2f(1.0f, 1.0f); glVertex3f(0.815f, 0.025f, -1.3f);
 			glEnd();
 		}
-		if (light_menu == 21)		{
+		if (light_menu == 21) {
 			glLoadIdentity();
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textures[3]);
@@ -1112,7 +1066,7 @@ static void display(void)
 			glTexCoord2f(1.0f, 1.0f); glVertex3f(0.815f, 0.075f, -1.3f);
 			glEnd();
 		}
-		if (light_menu == 24)		{
+		if (light_menu == 24) {
 			glLoadIdentity();
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textures[3]);
@@ -1123,7 +1077,7 @@ static void display(void)
 			glTexCoord2f(1.0f, 1.0f); glVertex3f(0.815f, 0.14f, -1.3f);
 			glEnd();
 		}
-		if (light_menu == 27)		{
+		if (light_menu == 27) {
 			glLoadIdentity();
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textures[3]);
@@ -1160,7 +1114,7 @@ static void display(void)
 		}
 		Active_quality();
 		Wait();
-	}	
+	}
 	if (clck_yes == true)
 	{
 		Exit_yes();
@@ -1176,12 +1130,12 @@ static void display(void)
 	glutSwapBuffers();
 }
 
-void MouseClicks(int button, int state, int x, int y)
+/*void MouseClicks(int button, int state, int x, int y)
 {
 
 	if (aspect_ratio > 1.77778)
 	{
-		// fõmenü start gomb
+		// fÃµmenÃ¼ start gomb
 		if ((quit1 == false) && (help == false) && (main_menu == true))
 		{
 			if ((y >= (height_global / 3) - y_difference) && (y <= (height_global / 2.3) - y_difference) && (x >= (width_global / 4) + x_difference) && (x <= ((width_global / 4) * 3) + x_difference)) {
@@ -1195,7 +1149,7 @@ void MouseClicks(int button, int state, int x, int y)
 					clck_start = true;
 				}
 			}
-			// fõmenü help gomb
+			// fÃµmenÃ¼ help gomb
 			if ((y >= (height_global / 2.1) - y_difference) && (y <= (height_global / 1.8) - y_difference) && (x >= (width_global / 4) + x_difference) && (x <= ((width_global / 4) * 3) + x_difference))
 			{
 				if ((button == GLFW_MOUSE_BUTTON_LEFT) && (state == GLUT_UP))
@@ -1207,7 +1161,7 @@ void MouseClicks(int button, int state, int x, int y)
 					clck_help = true;
 				}
 			}
-			// fõmenü kilépés gomb
+			// fÃµmenÃ¼ kilÃ©pÃ©s gomb
 			if ((y >= ((height_global / 3) * 1.9) - y_difference) && (y <= (height_global / 1.385) - y_difference) && (x >= (width_global / 4) + x_difference) && (x <= ((width_global / 4) * 3) + x_difference))
 			{
 				if ((button == GLFW_MOUSE_BUTTON_LEFT) && (state == GLUT_UP))
@@ -1219,7 +1173,7 @@ void MouseClicks(int button, int state, int x, int y)
 					clck_quit = true;
 				}
 			}
-			// fõmenü alacsony gomb
+			// fÃµmenÃ¼ alacsony gomb
 			if ((y >= (height_global / 1.11) - y_difference) && (y <= height_global - y_difference) && (x >= (width_global / 8.53) + x_difference) && (x <= (width_global / 2.56) + x_difference))
 			{
 				if ((button == GLFW_MOUSE_BUTTON_LEFT) && (state == GLUT_UP))
@@ -1233,7 +1187,7 @@ void MouseClicks(int button, int state, int x, int y)
 					wait = true;
 				}
 			}
-			// fõmenü közepes gomb
+			// fÃµmenÃ¼ kÃ¶zepes gomb
 			if ((y >= (height_global / 1.11) - y_difference) && (y <= height_global - y_difference) && (x >= (width_global / 2.56) + x_difference) && (x <= (width_global / 1.515) + x_difference))
 			{
 				if ((button == GLFW_MOUSE_BUTTON_LEFT) && (state == GLUT_UP))
@@ -1247,7 +1201,7 @@ void MouseClicks(int button, int state, int x, int y)
 					wait = true;
 				}
 			}
-			// fõmenü magas gomb
+			// fÃµmenÃ¼ magas gomb
 			if ((y >= (height_global / 1.11) - y_difference) && (y <= height_global - y_difference) && (x >= (width_global / 1.515) + x_difference) && (x <= (width_global / 1.155) + x_difference))
 			{
 				if ((button == GLFW_MOUSE_BUTTON_LEFT) && (state == GLUT_UP))
@@ -1276,7 +1230,7 @@ void MouseClicks(int button, int state, int x, int y)
 					clck_yes = true;
 				}
 			}
-			if ((y >= (height_global / 2.05)) && (y <= height_global / 1.65) && (x <= ((width_global / 3)*2) + x_difference) && (x >= ((width_global / 2)) + x_difference))
+			if ((y >= (height_global / 2.05)) && (y <= height_global / 1.65) && (x <= ((width_global / 3) * 2) + x_difference) && (x >= ((width_global / 2)) + x_difference))
 			{
 				if ((button == GLFW_MOUSE_BUTTON_LEFT) && (state == GLUT_UP))
 				{
@@ -1309,7 +1263,7 @@ void MouseClicks(int button, int state, int x, int y)
 	}
 	else
 	{
-		// fõmenü start gomb
+		// fÃµmenÃ¼ start gomb
 		if ((quit1 == false) && (help == false) && (main_menu == true))
 		{
 			if ((y >= (height_global / 3) + y_difference) && (y <= (height_global / 2.3) + y_difference) && (x >= (width_global / 4) - x_difference) && (x <= ((width_global / 4) * 3) - x_difference)) {
@@ -1323,7 +1277,7 @@ void MouseClicks(int button, int state, int x, int y)
 					clck_start = true;
 				}
 			}
-			// fõmenü help gomb
+			// fÃµmenÃ¼ help gomb
 			if ((y >= (height_global / 2.1) + y_difference) && (y <= (height_global / 1.8) + y_difference) && (x >= (width_global / 4) - x_difference) && (x <= ((width_global / 4) * 3) - x_difference))
 			{
 				if ((button == GLFW_MOUSE_BUTTON_LEFT) && (state == GLUT_UP))
@@ -1335,7 +1289,7 @@ void MouseClicks(int button, int state, int x, int y)
 					clck_help = true;
 				}
 			}
-			// fõmenü kilépés gomb
+			// fÃµmenÃ¼ kilÃ©pÃ©s gomb
 			if ((y >= ((height_global / 3) * 1.9) + y_difference) && (y <= (height_global / 1.385) + y_difference) && (x >= (width_global / 4) - x_difference) && (x <= ((width_global / 4) * 3) - x_difference))
 			{
 				if ((button == GLFW_MOUSE_BUTTON_LEFT) && (state == GLUT_UP))
@@ -1347,7 +1301,7 @@ void MouseClicks(int button, int state, int x, int y)
 					clck_quit = true;
 				}
 			}
-			// fõmenü alacsony gomb
+			// fÃµmenÃ¼ alacsony gomb
 			if ((y >= (height_global / 1.11) + y_difference) && (y <= height_global + y_difference) && (x >= (width_global / 8.53) - x_difference) && (x <= (width_global / 2.56) - x_difference))
 			{
 				if ((button == GLFW_MOUSE_BUTTON_LEFT) && (state == GLUT_UP))
@@ -1361,7 +1315,7 @@ void MouseClicks(int button, int state, int x, int y)
 					wait = true;
 				}
 			}
-			// fõmenü közepes gomb
+			// fÃµmenÃ¼ kÃ¶zepes gomb
 			if ((y >= (height_global / 1.11) + y_difference) && (y <= height_global + y_difference) && (x >= (width_global / 2.56) - x_difference) && (x <= (width_global / 1.515) - x_difference))
 			{
 				if ((button == GLFW_MOUSE_BUTTON_LEFT) && (state == GLUT_UP))
@@ -1375,7 +1329,7 @@ void MouseClicks(int button, int state, int x, int y)
 					wait = true;
 				}
 			}
-			// fõmenü magas gomb
+			// fÃµmenÃ¼ magas gomb
 			if ((y >= (height_global / 1.11) + y_difference) && (y <= height_global + y_difference) && (x >= (width_global / 1.515) - x_difference) && (x <= (width_global / 1.155) - x_difference))
 			{
 				if ((button == GLFW_MOUSE_BUTTON_LEFT) && (state == GLUT_UP))
@@ -1420,7 +1374,7 @@ void MouseClicks(int button, int state, int x, int y)
 		}
 		if (help == true)
 		{
-			if ((y >= ((height_global / 5)*4) + y_difference) && (y <= (height_global) + y_difference) && (x >= (width_global / 6)*5) && (x <= (width_global/32)*31))
+			if ((y >= ((height_global / 5) * 4) + y_difference) && (y <= (height_global)+y_difference) && (x >= (width_global / 6) * 5) && (x <= (width_global / 32) * 31))
 			{
 				if ((button == GLFW_MOUSE_BUTTON_LEFT) && (state == GLUT_UP))
 				{
@@ -1448,18 +1402,19 @@ void MouseClicks(int button, int state, int x, int y)
 		wait = false;
 		help_back = false;
 	}
-}
- 
+}*/
+
 int main(int argc, char *argv[])
 {
 	char resolution_in, quality_in;
 	bool full_screen = false, wrong = false, wrong_q = false;
-	do	{
-		if (wrong == true)	{
-			cout << "Hibas karaktermegadas, kerem adja meg ujra!\n";	}
+	do {
+		if (wrong == true) {
+			cout << "Hibas karaktermegadas, kerem adja meg ujra!\n";
+		}
 		cout << "Valassza ki a felbontast!\n     1-es gomb: 640x360(ablakos)\n     2-es gomb: 800x450(ablakos)\n     3-as gomb: 960x540(ablakos)\n     4-es gomb: 1280x720(ablakos)\n     5-os gomb: Teljes kepernyo\n";
 		cin >> resolution_in;
-		if (resolution_in == '5')	{
+		if (resolution_in == '5') {
 			full_screen = true;
 			width_global = 1920;
 			height_global = 1080;
@@ -1486,10 +1441,10 @@ int main(int argc, char *argv[])
 	glutSpecialFunc(spec);
 	glutKeyboardFunc(key_down);
 	glutKeyboardUpFunc(key_up);
-	glutMouseFunc(MouseClicks);
+	//glutMouseFunc(MouseClicks);
 
 	cout << "Setting up the default color.....\n";
-	glClearColor(0.6, 0.9, 1.0, 1); //háttérszín
+	glClearColor(0.6, 0.9, 1.0, 1); //hÃ¡ttÃ©rszÃ­n
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glMatrixMode(GL_MODELVIEW);
@@ -1517,12 +1472,13 @@ int main(int argc, char *argv[])
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_ambient);
 	cout << "Window identifier: " << window << "\n";
 	cout << "Initalize fog.....\n";
-	if (full_screen == true){
-		glutFullScreen();	}
+	if (full_screen == true) {
+		glutFullScreen();
+	}
 	LoadGUITextures();
 	world.LoadTextures(1);
+	world.LoadModels();
 	Fog();
-    LoadModel();
 	glutMainLoop();
 	return 0;
 }

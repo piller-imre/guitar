@@ -1,36 +1,43 @@
-#ifndef DRAWSCENE_H
+ï»¿#ifndef DRAWSCENE_H
 #define DRAWSCENE_H
-
+#include "Model_drawer.h"
 #include <stdio.h>
-#include <SOIL/SOIL.h>
+#include <SOIL.h>
 #include <stdlib.h>
 // #include <GLUT.h>
 // #include <GL/GLU.h>
-#include <GL/glut.h>
+#include <glut.h>
 #include <string>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-// átadja a külön osztálynak a felhasználó által választott minõséget
+// Ã¡tadja a kÃ¼lÃ¶n osztÃ¡lynak a felhasznÃ¡lÃ³ Ã¡ltal vÃ¡lasztott minÃµsÃ©get
 void SetQuality(int quality_in);
 
-//átadja a tárgyak forgásait a külön osztálynak
+//Ã¡tadja a tÃ¡rgyak forgÃ¡sait a kÃ¼lÃ¶n osztÃ¡lynak
 void SetRotation(float guitar_rotateAngle, double left_doorAngle, double right_doorAngle);
 
-//betölti a környezet textúráit
+//betÃ¶lti a kÃ¶rnyezet textÃºrÃ¡it
 bool LoadWorldTextures();
 
-//a környezet textúrái kirajzolásának kezdete
+//a kÃ¶rnyezet textÃºrÃ¡i kirajzolÃ¡sÃ¡nak kezdete
+void LoadModel();
 void Table();
 void Door_left();
 void Door_right();
 void Guitar();
 void Draw_World();
-//a környezet textúrái kirajzolásának vége
+//a kÃ¶rnyezet textÃºrÃ¡i kirajzolÃ¡sÃ¡nak vÃ©ge
 
 class DrawScene
 {
+
 public:
+
+	void LoadModels()
+	{
+		LoadModel();
+	}
 
 	void LoadTextures(int quality_in)
 	{
